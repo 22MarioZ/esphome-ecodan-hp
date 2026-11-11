@@ -1,7 +1,7 @@
 # ESPHome Ecodan heatpump
 
 > [!NOTE]
-> This fork contains modifications made for personal use and is maintained on a limited basis. For the latest updates and ongoing support, please use the [original repository](https://github.com/gekkekoe/esphome-ecodan-hp).
+> This fork is configured for a single-zone, heating-only Ecodan and is maintained for personal use on a limited basis. For the latest updates and ongoing support, please use the [original repository](https://github.com/gekkekoe/esphome-ecodan-hp).
 
 ESPHome implementation of the CN105 protocol. It can operate as standalone or with slave (Melcloud/Procon) attached. It includes server control mode, realtime power output estimation, and realtime daily energy counters.
 
@@ -16,13 +16,15 @@ The remote thermostat protocol CNRF is supported by [esphome-ecodan-remote-therm
 ### Home Assistant Dashboard
 ![HA Dashboard](img/ha-integration.png) 
 
+For this fork's configuration, use [ecodan-homeassistant-dashboard-single-zone-heating.yaml](ecodan-homeassistant-dashboard-single-zone-heating.yaml).
+
 # Features
 
 | Feature  | Description  |
 |----------|--------------|
 | Monitor | Monitor flow, frequency, temperatures, and more |
 | Control | Operating mode, target temperature, flow temperature, on/standby, vacation, and more |
-| Server Control | Restrict/Allow DHW/Heating/Cooling |
+| Server Control | Restrict/Allow DHW and Zone 1 heating |
 | Proxy support | Use a Melcloud WiFi adapter or Procon Melcobems unit in combination with the ESP |
 | Realtime metrics | `Power output`, `Consumption`, `Production`, `COP` (no external meter required, FTC6+) |
 | Misc* | `Fan speed`, `Compressor starts`, `Outdoor unit thermistors` |

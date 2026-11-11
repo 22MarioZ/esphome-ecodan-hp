@@ -1,0 +1,157 @@
+# Lovelace dashboard for the single-zone, heating-only firmware profile.
+# Entity IDs follow the repository's existing ESPHome dashboard example.
+views:
+  - title: Ecodan Heating
+    path: ecodan-single-zone-heating
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Overview
+            heading_style: title
+          - type: history-graph
+            hours_to_show: 6
+            entities:
+              - entity: sensor.ecodan_heatpump_operation_mode
+                name: Operation mode
+              - entity: binary_sensor.ecodan_heatpump_compressor
+                name: Compressor
+              - entity: binary_sensor.ecodan_heatpump_booster_heater
+                name: Booster heater
+              - entity: binary_sensor.ecodan_heatpump_defrost
+                name: Defrost
+              - entity: binary_sensor.ecodan_heatpump_short_cycle_lockout
+                name: Short-cycle lockout
+          - type: history-graph
+            hours_to_show: 6
+            entities:
+              - entity: sensor.ecodan_heatpump_feed_temp
+                name: Feed temperature
+              - entity: sensor.ecodan_heatpump_return_temp
+                name: Return temperature
+              - entity: sensor.ecodan_heatpump_zone_1_setpoint_value
+                name: Flow setpoint
+          - type: history-graph
+            hours_to_show: 6
+            entities:
+              - entity: sensor.ecodan_heatpump_compressor_frequency
+                name: Compressor frequency
+          - type: glance
+            title: Heating energy and performance
+            columns: 3
+            entities:
+              - entity: sensor.ecodan_heatpump_heating_consumed
+                name: Consumed
+              - entity: sensor.ecodan_heatpump_heating_delivered
+                name: Delivered
+              - entity: sensor.ecodan_heatpump_heating_cop
+                name: COP
+          - type: glance
+            title: Domestic hot water energy and performance
+            columns: 3
+            entities:
+              - entity: sensor.ecodan_heatpump_dhw_consumed
+                name: Consumed
+              - entity: sensor.ecodan_heatpump_dhw_delivered
+                name: Delivered
+              - entity: sensor.ecodan_heatpump_dhw_cop
+                name: COP
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Heating controls
+            heading_style: title
+          - type: tile
+            entity: climate.ecodan_heatpump_zone_1_flow_temp
+            name: Zone 1 flow temperature
+            features:
+              - type: target-temperature
+          - type: entities
+            title: Heating mode and server control
+            show_header_toggle: false
+            entities:
+              - entity: select.ecodan_heatpump_selected_operating_mode
+                name: Heating operating mode
+              - entity: switch.ecodan_heatpump_server_control
+                name: Server control
+              - entity: switch.ecodan_heatpump_server_control_zone_1_prohibit_heating
+                name: Prohibit Zone 1 heating
+          - type: entities
+            title: Auto Adaptive
+            show_header_toggle: false
+            state_color: true
+            entities:
+              - entity: switch.ecodan_heatpump_auto_adaptive_control
+                name: Enable Auto Adaptive
+              - entity: switch.ecodan_heatpump_auto_adaptive_defrost_mitigation
+                name: Defrost mitigation
+              - entity: switch.ecodan_heatpump_auto_adaptive_smart_boost
+                name: Smart Boost
+              - entity: select.ecodan_heatpump_auto_adaptive_heating_system_type
+                name: Heating system type
+              - entity: number.ecodan_heatpump_auto_adaptive_setpoint_bias
+                name: Setpoint bias
+              - entity: number.ecodan_heatpump_auto_adaptive_max_heating_flow_temperature
+                name: Maximum heating flow temperature
+              - entity: number.ecodan_heatpump_auto_adaptive_min_heating_flow_temperature
+                name: Minimum heating flow temperature
+              - entity: select.ecodan_heatpump_auto_adaptive_room_temperature_source_z1
+                name: Room temperature source
+              - entity: number.ecodan_heatpump_auto_adaptive_current_room_temperature_feedback_z1
+                name: Room temperature feedback
+          - type: entities
+            title: Short-cycle protection
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.ecodan_heatpump_short_cycle_lockout
+                name: Lockout status
+              - entity: button.ecodan_heatpump_short_cycle_cancel_lockout
+                name: Cancel lockout
+              - entity: select.ecodan_heatpump_short_cycle_lockout_duration_min
+                name: Lockout duration
+              - entity: number.ecodan_heatpump_short_cycle_minimum_on_time
+                name: Minimum compressor on-time
+              - entity: switch.ecodan_heatpump_short_cycle_predictive_prevention
+                name: Predictive prevention
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Domestic hot water and system
+            heading_style: title
+          - type: tile
+            entity: climate.ecodan_heatpump_dhw_climate
+            name: Domestic hot water
+            features:
+              - type: target-temperature
+          - type: entities
+            title: Heat pump controls
+            show_header_toggle: false
+            entities:
+              - entity: switch.ecodan_heatpump_heatpump
+                name: Heat pump power
+              - entity: select.ecodan_heatpump_dhw_mode
+                name: DHW mode
+              - entity: switch.ecodan_heatpump_force_dhw
+                name: Force DHW
+              - entity: switch.ecodan_heatpump_holiday_mode
+                name: Holiday mode
+              - entity: switch.ecodan_heatpump_server_control_prohibit_dhw
+                name: Prohibit DHW
+          - type: entities
+            title: Status
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.ecodan_heatpump_compressor
+                name: Compressor
+              - entity: binary_sensor.ecodan_heatpump_booster_heater
+                name: Booster heater
+              - entity: binary_sensor.ecodan_heatpump_defrost
+                name: Defrost
+              - entity: sensor.ecodan_heatpump_outside_temp
+                name: Outside temperature
+              - entity: sensor.ecodan_heatpump_flow_rate
+                name: Flow rate

@@ -149,6 +149,10 @@
         
         .hidden { visibility: hidden; pointer-events: none; }
 
+        /* Single-zone, heating-only firmware profile. */
+        #zone2-toggle-row, #z2-limits-container, #step-4, #ind-4,
+        #z1-cool-settings, #z2-cool-settings { display: none !important; }
+
         /* Mobile: tighten paddings, keep text legible */
         @media (max-width: 480px) {
             .wizard-wrap { padding: 18px 10px; }
@@ -204,7 +208,6 @@
                 <b>Using the virtual thermostat requires some wiring:</b>
                 <ul class="option-list">
                     <li><b>Zone 1:</b> where your controller provides a relay output, connect it to <code>IN1</code> on the FTC board. Set dip-switch <b>SW2-1</b> to <b>ON</b>.</li>
-                    <li><b>Zone 2:</b> where your controller provides a second relay output, connect it to <code>IN6</code> on the FTC board. Set dip-switch <b>SW3-1</b> to <b>ON</b>.</li>
                     <li><b>Migrating from a wireless (CNRF) thermostat?</b> Set dip-switch <b>SW1-8</b> to <b>OFF</b>.</li>
                     <li><b>Using the wireless thermostat as temperature source?</b> Keep <b>SW1-8</b> in the <b>ON</b> position and set on the MRC: <i>Initial settings → Room sensor settings → Room RC zone select</i> to <b>MRC</b>.</li>
                     <li><b>⚠ Switch the heat pump power off</b> at the breaker before touching any internal wiring.</li>
@@ -240,9 +243,7 @@
             <div class="ctrl-row">
                 <span class="ctrl-label">Operating Mode</span>
                 <select id="w-op-mode-z1" class="ctrl-select" onchange="toggleModeSettings()">
-                    <!-- Index 1 corresponds to Heat Flow, Index 4 to Cool Flow in the operating mode options -->
                     <option value="1">Heat Flow Temperature</option>
-                    <option value="4">Cool Flow Temperature</option>
                 </select>
             </div>
 
@@ -271,7 +272,7 @@
             </div>
 
             <!-- Enable Zone 2 -->
-            <div class="ctrl-row" style="margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 15px;">
+            <div class="ctrl-row" id="zone2-toggle-row" style="margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 15px;">
                 <span class="ctrl-label" style="font-weight: 600; color: var(--text);">Enable Zone 2 Settings</span>
                 <label class="toggle-wrap">
                     <input type="checkbox" id="w-enable-z2" onchange="toggleZ2Fields()">
@@ -392,13 +393,13 @@
 <script>
     let currentStep = 0;
     const totalSteps = 6;
-    const stepNames = ["Thermostat", "Auto Adaptive", "Mode & Flow Limits", "Zone 1 Sensors", "Zone 2 Sensors", "Activate Control"];
+    const stepNames = ["Thermostat", "Auto Adaptive", "Mode & Flow Limits", "Zone 1 Sensors", "", "Activate Control"];
 
     let thermostatChoice = null; // 'virtual' | 'mrc'
     let aaChoice = null;         // 'yes' | 'no'
 
     // Device state captured on load (for the Room Temp Source auto-adjustment)
-    let savedSrcZ1 = 0, savedSrcZ2 = 0, savedTempSrcZ1 = 0, savedTempSrcZ2 = 0, savedZone2 = false;
+    let savedSrcZ1 = 0, savedTempSrcZ1 = 0;
 
     // Load actual device state on load
     async function loadConfig() {
@@ -419,26 +420,16 @@
             // Step 2: Mode & Limits
             if (d.operating_mode_z1 !== undefined && d.operating_mode_z1 !== null) {
                 const el = document.getElementById('w-op-mode-z1');
-                if (parseInt(d.operating_mode_z1) === 4) el.value = "4"; // Cool Flow
-                else el.value = "1"; // Default to Heat Flow
+                el.value = "1"; // Heat Flow Temperature only
             }
             
             setVal('w-max-flow-z1', d.maximum_heating_flow_temp);
             setVal('w-min-flow-z1', d.minimum_heating_flow_temp);
-            setVal('w-cool-start-z1', d.cooling_smart_start_z1);
-            setVal('w-cool-min-z1', d.minimum_cooling_flow_z1);
-
-            setCheck('w-enable-z2', d.zone2_enabled);
-
-            setVal('w-max-flow-z2', d.maximum_heating_flow_temp_z2);
-            setVal('w-min-flow-z2', d.minimum_heating_flow_temp_z2);
 
             // Step 3 & 4: Sensors (Fix applied: removing sel_ prefix)
             setVal('w-room-src-z1', d.room_temp_source_z1);
             setVal('w-temp-src-z1', d.temp_sensor_source_z1);
             
-            setVal('w-room-src-z2', d.room_temp_source_z2);
-            setVal('w-temp-src-z2', d.temp_sensor_source_z2);
 
             // Step 5: Enable
             setCheck('w-aa-enable', d.auto_adaptive_control_enabled);
@@ -446,20 +437,14 @@
             // Remember stored state (used by the thermostat choice to mirror
             // the dashboard's auto-adjustment of the Room Temp Source)
             savedSrcZ1 = parseInt(d.room_temp_source_z1);
-            savedSrcZ2 = parseInt(d.room_temp_source_z2);
             if (isNaN(savedSrcZ1)) savedSrcZ1 = 0;
-            if (isNaN(savedSrcZ2)) savedSrcZ2 = 0;
             savedTempSrcZ1 = parseInt(d.temp_sensor_source_z1);
-            savedTempSrcZ2 = parseInt(d.temp_sensor_source_z2);
             if (isNaN(savedTempSrcZ1)) savedTempSrcZ1 = 0;
-            if (isNaN(savedTempSrcZ2)) savedTempSrcZ2 = 0;
-            savedZone2 = !!d.zone2_enabled;
 
             // Trigger UI updates based on loaded values
             toggleModeSettings();
             toggleZ2Fields();
             toggleApiInfo('z1');
-            toggleApiInfo('z2');
 
         } catch(e) {
             console.warn('Could not load existing config. UI will use HTML defaults.', e);
@@ -548,7 +533,7 @@
     // The Zone 2 Sensors step (index 4) only exists in the wizard when
     // "Enable Zone 2 Settings" is on — the remaining steps are renumbered.
     function z2Enabled() {
-        return document.getElementById('w-enable-z2').checked;
+        return false;
     }
     function effectiveSteps() {
         return z2Enabled() ? totalSteps : totalSteps - 1;
@@ -567,16 +552,7 @@
 
     // Toggle parameters based on Heat or Cool selection in Step 2
     function toggleModeSettings() {
-        const mode = document.getElementById('w-op-mode-z1').value;
-        const isCooling = (mode === "4"); // 4 corresponds to Cool Flow Temperature
-
-        // Zone 1
-        document.getElementById('z1-heat-settings').style.display = isCooling ? 'none' : 'block';
-        document.getElementById('z1-cool-settings').style.display = isCooling ? 'block' : 'none';
-
-        // Zone 2
-        document.getElementById('z2-heat-settings').style.display = isCooling ? 'none' : 'block';
-        document.getElementById('z2-cool-settings').style.display = isCooling ? 'block' : 'none';
+        document.getElementById('z1-heat-settings').style.display = 'block';
     }
 
     // Toggles the Zone 2 limits and sensors based on the checkbox in Step 2
@@ -675,7 +651,6 @@
         // builds the z2 key is a harmless no-op on the server side.
         const useRoom = (thermostatChoice === 'mrc') ? 1 : 0;
         payload.push({ key: 'ui_use_room_z1', value: useRoom });
-        payload.push({ key: 'ui_use_room_z2', value: useRoom });
 
         // When skipping the AA steps, apply the thermostat choice's forced
         // sensor-step values (mirrored into the selects) — only what changed.
@@ -686,45 +661,21 @@
             };
             pushIfChanged('room_temp_source_z1', 'w-room-src-z1', savedSrcZ1);
             pushIfChanged('temp_sensor_source_z1', 'w-temp-src-z1', savedTempSrcZ1);
-            if (savedZone2) {
-                pushIfChanged('room_temp_source_z2', 'w-room-src-z2', savedSrcZ2);
-                pushIfChanged('temp_sensor_source_z2', 'w-temp-src-z2', savedTempSrcZ2);
-            }
         }
 
         // Steps 2-5: Auto Adaptive settings (only when opted in)
         if (aaChoice === 'yes') {
             const getVal = id => parseInt(document.getElementById(id).value);
             const getFloat = id => parseFloat(document.getElementById(id).value);
-            const hasZ2 = document.getElementById('w-enable-z2').checked;
             const opMode = getVal('w-op-mode-z1');
-            const isCooling = (opMode === 4);
 
             // Basic settings payload
             payload.push({ key: 'operating_mode_z1', value: opMode });
             payload.push({ key: 'room_temp_source_z1', value: getVal('w-room-src-z1') });
             payload.push({ key: 'temp_sensor_source_z1', value: getVal('w-temp-src-z1') });
 
-            // Conditional Flow Limits Z1
-            if (isCooling) {
-                payload.push({ key: 'cooling_smart_start_z1', value: getFloat('w-cool-start-z1') });
-                payload.push({ key: 'minimum_cooling_flow_z1', value: getFloat('w-cool-min-z1') });
-            } else {
-                payload.push({ key: 'maximum_heating_flow_temp', value: getFloat('w-max-flow-z1') });
-                payload.push({ key: 'minimum_heating_flow_temp', value: getFloat('w-min-flow-z1') });
-            }
-
-            // Zone 2 specifics
-            if (hasZ2) {
-                payload.push({ key: 'room_temp_source_z2', value: getVal('w-room-src-z2') });
-                payload.push({ key: 'temp_sensor_source_z2', value: getVal('w-temp-src-z2') });
-                
-                // Only push Z2 heating limits if we are not in cooling mode
-                if (!isCooling) {
-                    payload.push({ key: 'maximum_heating_flow_temp_z2', value: getFloat('w-max-flow-z2') });
-                    payload.push({ key: 'minimum_heating_flow_temp_z2', value: getFloat('w-min-flow-z2') });
-                }
-            }
+            payload.push({ key: 'maximum_heating_flow_temp', value: getFloat('w-max-flow-z1') });
+            payload.push({ key: 'minimum_heating_flow_temp', value: getFloat('w-min-flow-z1') });
 
             // Finally, toggle the enable switch
             payload.push({ key: 'auto_adaptive_control_enabled', value: document.getElementById('w-aa-enable').checked ? 1 : 0 });

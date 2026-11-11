@@ -46,21 +46,15 @@ esphome:
             state.operation_mode = id(operation_mode);
             state.hp_feed_temp = id(hp_feed_temp);
             state.z1_feed_temp = id(z1_feed_temp);
-            ${z2_cpp_prefix} state.z2_feed_temp = id(z2_feed_temp);
             ${asgard_prefix} state.asgard_vt_z1 = id(virtual_climate_z1);
-            ${asgard_prefix} ${z2_cpp_prefix} state.asgard_vt_z2 = id(virtual_climate_z2);
             ${asgard_prefix} state.relay_switch_z1 = id(asgard_relay_z1);
-            ${asgard_prefix} ${z2_cpp_prefix} state.relay_switch_z2 = id(asgard_relay_z2);
             ${asgard_prefix} state.sw_odin_override_z1 = id(sw_odin_override_z1);
-            ${asgard_prefix} ${z2_cpp_prefix} state.sw_odin_override_z2 = id(sw_odin_override_z2);
 
             state.heating_system_type = id(heating_system_type);
             state.temperature_feedback_source_z1 = id(temperature_feedback_source_z1);
-            ${z2_cpp_prefix} state.temperature_feedback_source_z2 = id(temperature_feedback_source_z2);
 
             ${asgard_prefix} state.odin_inherit_max_age = id(odin_inherit_max_age);
             ${asgard_prefix} state.vt_temp_sensor_source_z1 = id(asgard_vt_temp_sensor_source_z1);
-            ${asgard_prefix} ${z2_cpp_prefix} state.vt_temp_sensor_source_z2 = id(asgard_vt_temp_sensor_source_z2);
 
             state.lockout_duration = id(lockout_duration);
             state.lockout_strategy = id(lockout_strategy);
@@ -69,15 +63,8 @@ esphome:
 
             state.auto_adaptive_setpoint_bias = id(auto_adaptive_setpoint_bias);
             state.temperature_feedback_z1 = id(temperature_feedback_z1);
-            state.temperature_feedback_z2 = id(temperature_feedback_z2);
             state.maximum_heating_flow_temp = id(maximum_heating_flow_temp);
             state.minimum_heating_flow_temp = id(minimum_heating_flow_temp);
-            state.maximum_heating_flow_temp_z2 = id(maximum_heating_flow_temp_z2);
-            state.minimum_heating_flow_temp_z2 = id(minimum_heating_flow_temp_z2);
-            state.minimum_cooling_flow_temp_z1 = id(minimum_cooling_flow_temp_z1);
-            ${z2_cpp_prefix} state.minimum_cooling_flow_temp_z2 = id(minimum_cooling_flow_temp_z2);
-
-            state.cooling_smart_start_temp = id(cooling_smart_start_temp);
             state.minimum_compressor_on_time = id(minimum_compressor_on_time);
 
 
@@ -114,58 +101,6 @@ number:
     max_value: 40.0
     step: 0.5
 
-  - platform: template
-    id: maximum_heating_flow_temp_z2
-    name: ${maximum_heating_flow_temp} z2
-    unit_of_measurement: "°C"
-    optimistic: true
-    restore_value: true
-    initial_value: 35.0
-    min_value: 25.0
-    max_value: 55.0
-    step: 0.5
-  - platform: template
-    id: minimum_heating_flow_temp_z2
-    name: ${minimum_heating_flow_temp} z2
-    unit_of_measurement: "°C"
-    optimistic: true
-    restore_value: true
-    initial_value: 25.0
-    min_value: 24.0
-    max_value: 40.0
-    step: 0.5
-  - platform: template
-    id: cooling_smart_start_temp
-    unit_of_measurement: "°C"
-    name: ${cooling_smart_start_temp}
-    optimistic: true
-    restore_value: true
-    initial_value: 19.0
-    min_value: 16.0
-    max_value: 25.0
-    step: 0.5
-
-  - platform: template
-    id: minimum_cooling_flow_temp_z1
-    name: ${minimum_cooling_flow_temp} z1
-    unit_of_measurement: "°C"
-    optimistic: true
-    restore_value: true
-    initial_value: 18.0
-    min_value: 5.0
-    max_value: 25.0
-    step: 0.1
-    
-  - platform: template
-    id: minimum_cooling_flow_temp_z2
-    name: ${minimum_cooling_flow_temp} z2
-    unit_of_measurement: "°C"
-    optimistic: true
-    restore_value: true
-    initial_value: 18.0
-    min_value: 5.0
-    max_value: 25.0
-    step: 0.1
 
   - platform: template
     id: auto_adaptive_setpoint_bias
@@ -180,16 +115,6 @@ number:
   - platform: template
     id: temperature_feedback_z1
     name: ${temperature_feedback} z1
-    unit_of_measurement: "°C"
-    optimistic: true
-    restore_value: true
-    initial_value: 20.0
-    min_value: -50
-    max_value: 100
-    step: 0.1
-  - platform: template
-    id: temperature_feedback_z2
-    name: ${temperature_feedback} z2
     unit_of_measurement: "°C"
     optimistic: true
     restore_value: true
@@ -238,16 +163,6 @@ select:
   - platform: template
     id: temperature_feedback_source_z1
     name: ${temperature_feedback_source} z1
-    optimistic: true
-    restore_value: true
-    options:
-      - "${temperature_feedback_option_room}"
-      - "${select_feedback_option_api}"
-      - "${select_feedback_option_asgard_vt}"
-    initial_option: "${temperature_feedback_option_room}"
-  - platform: template
-    id: temperature_feedback_source_z2
-    name: ${temperature_feedback_source} z2
     optimistic: true
     restore_value: true
     options:

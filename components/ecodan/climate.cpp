@@ -56,10 +56,7 @@ namespace ecodan
                 break;
                 case ecodan::Status::HpMode::COOL_ROOM_TEMP:
                 case ecodan::Status::HpMode::COOL_FLOW_TEMP:
-                    if (this->mode != climate::ClimateMode::CLIMATE_MODE_COOL && allow_refresh) {
-                        this->mode = climate::ClimateMode::CLIMATE_MODE_COOL;
-                        should_publish = true;
-                    } 
+                    // Cooling is not exposed by this heating-only profile.
                 break;                    
             case ecodan::Status::HpMode::OFF:
                 break;
@@ -83,13 +80,6 @@ namespace ecodan
                         || static_cast<uint8_t>(this->climate_zone_identifier) == status.MultiZoneStatus) {                
                             new_action = climate::CLIMATE_ACTION_HEATING;
                         }
-                    break;
-                case ecodan::Status::OperationMode::COOL_ON:
-                     if (this->climate_zone_identifier == ClimateZoneIdentifier::SINGLE_ZONE
-                        || static_cast<uint8_t>(ClimateZoneIdentifier::MULTI_ZONE_BOTH) == status.MultiZoneStatus
-                        || static_cast<uint8_t>(this->climate_zone_identifier) == status.MultiZoneStatus) {                
-                            new_action = climate::CLIMATE_ACTION_COOLING;
-                        }               
                     break;
                 case ecodan::Status::OperationMode::UNAVAILABLE:
                 case ecodan::Status::OperationMode::OFF:
@@ -188,18 +178,14 @@ namespace ecodan
             traits.set_visual_max_temperature(60);
         }
         else if(this->thermostat_climate_mode) {
-            traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT, climate::CLIMATE_MODE_COOL});
+            traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT});
             traits.set_visual_min_temperature(8);
             traits.set_visual_max_temperature(28);
         }
         else 
         {
-            traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT, climate::CLIMATE_MODE_COOL});
-            // dynamic adjustment in esphome works, but does not seem to progagate to HA
-            // auto is_cooling = this->mode == climate::ClimateMode::CLIMATE_MODE_COOL;
-            // traits.set_visual_min_temperature(is_cooling ? 5 : 25);
-            // traits.set_visual_max_temperature(is_cooling ? 25 : 60);
-            traits.set_visual_min_temperature(5);
+            traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT});
+            traits.set_visual_min_temperature(24);
             traits.set_visual_max_temperature(60);           
             //ESP_LOGE(TAG, "min: %f, max: %f", traits.get_visual_min_temperature(), traits.get_visual_max_temperature());
         }
@@ -219,9 +205,8 @@ namespace ecodan
             min_limit = 8; max_limit = 28;
         }
         else {
-            auto is_cooling = this->mode == climate::ClimateMode::CLIMATE_MODE_COOL;
-            min_limit = is_cooling ? 5 : 24;
-            max_limit = is_cooling ? 25 : 60;
+            min_limit = 24;
+            max_limit = 60;
         }
     }
 

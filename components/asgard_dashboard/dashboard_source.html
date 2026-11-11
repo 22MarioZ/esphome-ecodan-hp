@@ -35,6 +35,13 @@ header {
     user-select: none; padding-right: 2px; flex: 0 0 auto;
   }
 
+  /* This firmware profile exposes only Zone 1 heating and DHW. */
+  #card-z2, #aa-z2-container, #sc-z2-prohibits,
+  #cool-settings-z1, #cool-settings-z2, #condensation-warning-z1,
+  #condensation-warning-z2, #sc-prohibit-z1-cool-row,
+  #perf-cooling-row, #aa-cooling-smart-start-row,
+  #leg-z2, #leg-z2-curr, #leg-z2-flow { display: none !important; }
+
   .tab-bar { 
     display: flex; gap: 10px; padding: 10px 16px; margin: 0; 
     border-bottom: 1px solid var(--border); background: var(--bg); 
@@ -511,7 +518,6 @@ header {
       <div class="section-title" style="margin:0">Compressor Frequency</div>
       <div class="chart-legend">
         <div class="legend-item"><div class="legend-dot" style="background:#ff6b35"></div>Heating</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#00c8ff"></div>Cooling</div>
         <div class="legend-item"><div class="legend-dot" style="background:#ffb020"></div>DHW</div>
         <div class="legend-item"><div class="legend-dot" style="background:#7fff7f"></div>Legionella</div>
         <div class="legend-item"><div class="legend-dot" style="background:#c084fc"></div>Defrost</div>
@@ -557,7 +563,7 @@ header {
       </div>
     </div>
 
-    <div class="ctrl-row" style="padding: 10px 0;">
+    <div class="ctrl-row" id="perf-cooling-row" style="padding: 10px 0;">
       <div style="display:flex; align-items:center; gap:12px; width:100%">
         <div style="width:32px; height:32px; background:rgba(0,200,255,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#00c8ff;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"></path><path d="M12 2v20"></path><path d="M20 16l-4-4 4-4"></path><path d="M4 8l4 4-4 4"></path><path d="M16 4l-4 4-4-4"></path><path d="M8 20l4-4 4 4"></path></svg>
@@ -596,8 +602,7 @@ header {
     
     <div class="ctrl-card" id="card-z1">
       <div class="section-title">Zone 1</div>
-      <div class="ctrl-row"><span class="ctrl-label param-label">Operating Mode<span class="tip-icon">?</span><span class="tip-box">The Ecodan controller's own operating mode for this zone. Auto-Adaptive (below) only works in a Flow Temperature mode.</span></span><select class="ctrl-select" id="sel-z1mode" onchange="sendSelect('operating_mode_z1', this)"><option>Heat Target Temperature</option><option>Heat Flow Temperature</option><option>Heat Compensation Curve</option><option>Cool Target Temperature</option><option>Cool Flow Temperature</option><option>Floor Dry Up</option><option>Cool Compensation Curve</option></select></div>
-      <div class="condensation-warning" id="condensation-warning-z1">⚠ Cool Target Temperature can drive the flow temperature very low, creating a high risk of condensation on the emitters.</div>
+      <div class="ctrl-row"><span class="ctrl-label param-label">Operating Mode<span class="tip-icon">?</span><span class="tip-box">The Ecodan controller's operating mode for Zone 1. Auto-Adaptive works in Flow Temperature mode.</span></span><select class="ctrl-select" id="sel-z1mode" onchange="sendSelect('operating_mode_z1', this)"><option>Heat Target Temperature</option><option>Heat Flow Temperature</option><option>Heat Compensation Curve</option><option>Floor Dry Up</option></select></div>
       
       <div id="flow-z1-area" style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 15px; background: var(--bg2);">
         <div class="sub-label" style="margin-top: 0; border: none; padding-bottom: 10px;">Flow Climate Z1</div>
@@ -621,7 +626,7 @@ header {
           <span id="dot-z1" class="status-dot"></span>Virtual Thermostat Z1
         </div>
 
-        <div class="ctrl-row"><span class="ctrl-label param-label">Thermostat Mode<span class="tip-icon">?</span><span class="tip-box">Heat/Cool/Off for the Virtual Thermostat below. Must match what the heat pump is actually doing — set to Off if you want to control the relay manually.</span></span><select class="ctrl-select" id="sel-z1-vmode" onchange="sendVMode('z1', this)"><option value="heat">Heat</option><option value="cool">Cool</option><option value="off">Off</option></select></div>
+        <div class="ctrl-row"><span class="ctrl-label param-label">Thermostat Mode<span class="tip-icon">?</span><span class="tip-box">Heat or Off for the Virtual Thermostat below. Set to Off if you want to control the relay manually.</span></span><select class="ctrl-select" id="sel-z1-vmode" onchange="sendVMode('z1', this)"><option value="heat">Heat</option><option value="off">Off</option></select></div>
         <div class="ctrl-row" style="margin-bottom: 10px; padding-bottom: 12px;">
           <span class="ctrl-label param-label">Temp Sensor Source<span class="tip-icon">?</span>
             <span class="tip-box">
@@ -745,7 +750,7 @@ header {
         </div>
 
         <div class="ctrl-row" style="border-bottom: none; padding-bottom: 0;"><span class="ctrl-label param-label">Setpoint Bias<span class="tip-icon">?</span><span class="tip-box">A flat offset added to whatever flow temperature Auto-Adaptive calculates. Positive if the room consistently runs cold, negative if it consistently overshoots.</span></span><div class="stepper"><button class="step-btn" onclick="step('aa-bias', -0.1)">−</button><input type="number" class="step-input" id="aa-bias-val" onchange="manualInput('aa-bias', this.value)"><button class="step-btn" onclick="step('aa-bias', +0.1)">+</button></div></div>
-        <div class="ctrl-row"><span class="ctrl-label param-label">Global Smart Start Temp<span class="tip-icon">?</span><span class="tip-box">Ceiling on the flow temperature for the first command when a cooling cycle starts, so the system doesn't demand a fully-cold flow while the emitter water is still warm from sitting idle. Only applies before the compressor is actively cooling — once it's running, this cap is lifted and the algorithm targets the true calculated flow. Shared across both zones.</span></span><div class="stepper"><button class="step-btn" onclick="step('cool-start-z1', -0.5)">−</button><input type="number" class="step-input" id="cool-start-z1-val" onchange="manualInput('cool-start-z1', this.value)"><button class="step-btn" onclick="step('cool-start-z1', +0.5)">+</button></div></div>
+        <div class="ctrl-row" id="aa-cooling-smart-start-row"><span class="ctrl-label param-label">Global Smart Start Temp<span class="tip-icon">?</span><span class="tip-box">Ceiling on the flow temperature for the first command when a cooling cycle starts, so the system doesn't demand a fully-cold flow while the emitter water is still warm from sitting idle. Only applies before the compressor is actively cooling — once it's running, this cap is lifted and the algorithm targets the true calculated flow. Shared across both zones.</span></span><div class="stepper"><button class="step-btn" onclick="step('cool-start-z1', -0.5)">−</button><input type="number" class="step-input" id="cool-start-z1-val" onchange="manualInput('cool-start-z1', this.value)"><button class="step-btn" onclick="step('cool-start-z1', +0.5)">+</button></div></div>
         <div class="sub-label" style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--border); padding-bottom: 5px;">Settings Z1</div>
 
         <div class="ctrl-row">
@@ -1053,7 +1058,6 @@ header {
       <div style="font-family: var(--mono); font-size: 11px; color: var(--text2); display: grid; grid-template-columns: max-content 1fr; gap: 3px 14px;">
         <span style="color: var(--text3);">Heat pump</span><span>Feed <span id="ow-sum-feed">—</span> · Return <span id="ow-sum-return">—</span> · ΔT <span id="ow-sum-delta">—</span></span>
         <span style="color: var(--text3);">Zone 1</span><span>Sensor <span id="ow-sum-z1">—</span> · Feed <span id="ow-sum-z1f">—</span> · Return <span id="ow-sum-z1r">—</span></span>
-        <span style="color: var(--text3);">Zone 2</span><span>Sensor <span id="ow-sum-z2">—</span> · Feed <span id="ow-sum-z2f">—</span> · Return <span id="ow-sum-z2r">—</span></span>
       </div>
       <div class="ctrl-row" style="margin-top: 12px;"><span class="ctrl-label param-label">Use DS18x20 Probes for Calculations<span class="tip-icon">?</span><span class="tip-box">When off, every probe reads as absent: the Auto-Adaptive output-power estimate and the zone feed and return temperatures fall back to the heat pump's own thermistors.</span></span><label class="toggle-wrap"><input type="checkbox" id="sw-ow" onchange="sendSwitch('ow_enable', this.checked)"><span class="toggle-slider"></span></label></div>
 
@@ -1069,13 +1073,10 @@ header {
             <select class="ctrl-select" id="ow-role-0" onchange="sendOwRole(0, this)">
               <option value="">Unmapped</option>
               <option value="ow_map_z1">Virtual thermostat z1 sensor</option>
-              <option value="ow_map_z2">Virtual thermostat z2 sensor</option>
               <option value="ow_map_feed">Primary feed</option>
               <option value="ow_map_return">Primary return</option>
               <option value="ow_map_z1_feed">Zone 1 feed</option>
               <option value="ow_map_z1_return">Zone 1 return</option>
-              <option value="ow_map_z2_feed">Zone 2 feed</option>
-              <option value="ow_map_z2_return">Zone 2 return</option>
             </select>
           </div>
           <div class="ctrl-row" style="border-bottom: none; padding-bottom: 0;">
@@ -1101,13 +1102,10 @@ header {
             <select class="ctrl-select" id="ow-role-1" onchange="sendOwRole(1, this)">
               <option value="">Unmapped</option>
               <option value="ow_map_z1">Virtual thermostat z1 sensor</option>
-              <option value="ow_map_z2">Virtual thermostat z2 sensor</option>
               <option value="ow_map_feed">Primary feed</option>
               <option value="ow_map_return">Primary return</option>
               <option value="ow_map_z1_feed">Zone 1 feed</option>
               <option value="ow_map_z1_return">Zone 1 return</option>
-              <option value="ow_map_z2_feed">Zone 2 feed</option>
-              <option value="ow_map_z2_return">Zone 2 return</option>
             </select>
           </div>
           <div class="ctrl-row" style="border-bottom: none; padding-bottom: 0;">
@@ -1133,13 +1131,10 @@ header {
             <select class="ctrl-select" id="ow-role-2" onchange="sendOwRole(2, this)">
               <option value="">Unmapped</option>
               <option value="ow_map_z1">Virtual thermostat z1 sensor</option>
-              <option value="ow_map_z2">Virtual thermostat z2 sensor</option>
               <option value="ow_map_feed">Primary feed</option>
               <option value="ow_map_return">Primary return</option>
               <option value="ow_map_z1_feed">Zone 1 feed</option>
               <option value="ow_map_z1_return">Zone 1 return</option>
-              <option value="ow_map_z2_feed">Zone 2 feed</option>
-              <option value="ow_map_z2_return">Zone 2 return</option>
             </select>
           </div>
           <div class="ctrl-row" style="border-bottom: none; padding-bottom: 0;">
@@ -1165,13 +1160,10 @@ header {
             <select class="ctrl-select" id="ow-role-3" onchange="sendOwRole(3, this)">
               <option value="">Unmapped</option>
               <option value="ow_map_z1">Virtual thermostat z1 sensor</option>
-              <option value="ow_map_z2">Virtual thermostat z2 sensor</option>
               <option value="ow_map_feed">Primary feed</option>
               <option value="ow_map_return">Primary return</option>
               <option value="ow_map_z1_feed">Zone 1 feed</option>
               <option value="ow_map_z1_return">Zone 1 return</option>
-              <option value="ow_map_z2_feed">Zone 2 feed</option>
-              <option value="ow_map_z2_return">Zone 2 return</option>
             </select>
           </div>
           <div class="ctrl-row" style="border-bottom: none; padding-bottom: 0;">
@@ -1197,13 +1189,10 @@ header {
             <select class="ctrl-select" id="ow-role-4" onchange="sendOwRole(4, this)">
               <option value="">Unmapped</option>
               <option value="ow_map_z1">Virtual thermostat z1 sensor</option>
-              <option value="ow_map_z2">Virtual thermostat z2 sensor</option>
               <option value="ow_map_feed">Primary feed</option>
               <option value="ow_map_return">Primary return</option>
               <option value="ow_map_z1_feed">Zone 1 feed</option>
               <option value="ow_map_z1_return">Zone 1 return</option>
-              <option value="ow_map_z2_feed">Zone 2 feed</option>
-              <option value="ow_map_z2_return">Zone 2 return</option>
             </select>
           </div>
           <div class="ctrl-row" style="border-bottom: none; padding-bottom: 0;">
@@ -1229,13 +1218,10 @@ header {
             <select class="ctrl-select" id="ow-role-5" onchange="sendOwRole(5, this)">
               <option value="">Unmapped</option>
               <option value="ow_map_z1">Virtual thermostat z1 sensor</option>
-              <option value="ow_map_z2">Virtual thermostat z2 sensor</option>
               <option value="ow_map_feed">Primary feed</option>
               <option value="ow_map_return">Primary return</option>
               <option value="ow_map_z1_feed">Zone 1 feed</option>
               <option value="ow_map_z1_return">Zone 1 return</option>
-              <option value="ow_map_z2_feed">Zone 2 feed</option>
-              <option value="ow_map_z2_return">Zone 2 return</option>
             </select>
           </div>
           <div class="ctrl-row" style="border-bottom: none; padding-bottom: 0;">
@@ -2409,47 +2395,18 @@ function updateDot(id, action) {
 }
 
 function toggleCoolingUI() {
-  // --- Zone 1 ---
-  const opModeZ1 = document.getElementById('sel-z1mode')?.selectedIndex;
-  const z1IsCooling = (opModeZ1 === 3 || opModeZ1 === 4 || opModeZ1 === 6);
-  
   const h1 = document.getElementById('heat-settings-z1');
-  if (h1) h1.style.display = z1IsCooling ? 'none' : 'block';
-  
-  // --- Zone 2 ---
-  const opModeZ2 = document.getElementById('sel-z2mode')?.selectedIndex;
-  const z2IsCooling = (opModeZ2 === 3 || opModeZ2 === 4 || opModeZ2 === 6);
-  
-  const h2 = document.getElementById('heat-settings-z2');  
-  if (h2) h2.style.display = z2IsCooling ? 'none' : 'block';
-
-  const c2 = document.getElementById('cool-settings-z2');
-  if (c2) c2.style.display = z2IsCooling ? 'block' : 'none';
-  
-  const isCoolingMode = z1IsCooling || z2IsCooling;
+  if (h1) h1.style.display = 'block';
   const cGlobal = document.getElementById('cool-settings-z1');
-  if (cGlobal) cGlobal.style.display = isCoolingMode ? 'block' : 'none';
+  if (cGlobal) cGlobal.style.display = 'none';
 
-  // --- Condensation Warning (only for Cool Target Temperature, index 3) ---
-  const w1 = document.getElementById('condensation-warning-z1');
-  if (w1) w1.style.display = (opModeZ1 === 3) ? 'block' : 'none';
-
-  const w2 = document.getElementById('condensation-warning-z2');
-  if (w2) w2.style.display = (opModeZ2 === 3) ? 'block' : 'none';
-
-  // --- Auto Adaptive Validation ---
-  // Check if Zone 2 is active in the UI
-  const z2Card = document.getElementById('card-z2');
-  const isZ2Active = z2Card && z2Card.style.display !== 'none';
-
-  // Index 1 = Heat Flow Temperature, Index 4 = Cool Flow Temperature
-  const z1Valid = (opModeZ1 === 1 || opModeZ1 === 4);
-  const z2Valid = !isZ2Active || (opModeZ2 === 1 || opModeZ2 === 4);
+  // Auto Adaptive only accepts the heat flow-temperature mode (index 1).
+  const opModeZ1 = document.getElementById('sel-z1mode')?.selectedIndex;
+  const z1Valid = opModeZ1 === 1;
 
   const aaCard = document.getElementById('card-aa');
   if (aaCard) {
-    // Disable the Auto Adaptive card if the conditions are not met
-    aaCard.classList.toggle('disabled-box', !(z1Valid && z2Valid));
+    aaCard.classList.toggle('disabled-box', !z1Valid);
   }
 
 }
@@ -2457,7 +2414,7 @@ function toggleCoolingUI() {
 function render(d) {
   // DEBUG DEBUG
   // d.zone2_enabled = true;
-  const isZ2 = (d.zone2_enabled !== undefined) ? d.zone2_enabled : true;
+  const isZ2 = false;
 
   if (d.ui_use_room_z1 !== undefined) {
     const cbZ1 = document.getElementById('ui-room-z1');

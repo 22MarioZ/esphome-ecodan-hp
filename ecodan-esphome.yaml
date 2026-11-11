@@ -43,9 +43,6 @@ http_request:
 #  led_status: !include confs/led.yaml
 #  zone1: !include confs/zone1.yaml
 #  svc_z1: !include confs/server-control-z1.yaml
-# # disable if you don't want to use zone 2
-# # zone2: !include confs/zone2.yaml
-# # svc_z2: !include confs/server-control-z2.yaml
 # # change language labels to -en for English or -nl for Dutch
 # # substitutions: !include confs/ecodan-labels-nl.yaml
 #  substitutions: !include confs/ecodan-labels-en.yaml
@@ -57,7 +54,7 @@ http_request:
 #  adaptive: !include confs/auto-adaptive.yaml
 
 external_components:
-  - source: github://22MarioZ/esphome-ecodan-hp@main
+  - source: github://22MarioZ/esphome-ecodan-hp@codex/single-zone-heating-only
     components:
       - ecodan
       - optimizer
@@ -80,7 +77,7 @@ packages:
 
   remote_package:
     url: https://github.com/22MarioZ/esphome-ecodan-hp
-    ref: main
+    ref: codex/single-zone-heating-only
     refresh: always
     files: [ 
             confs/base.yaml,            # required
@@ -91,9 +88,6 @@ packages:
             confs/esp32s3.yaml,         # confs/esp32.yaml, for regular board
             confs/zone1.yaml,
             confs/server-control-z1.yaml,
-            ## enable if you want to use zone 2
-            #confs/zone2.yaml,
-            #confs/server-control-z2.yaml,
             ## enable label language files
             confs/ecodan-labels-en.yaml,  # English
             # confs/ecodan-labels-nl.yaml,  # Dutch
@@ -181,13 +175,10 @@ asgard_dashboard:
   dhw_cop_id: ddhw_cop
   dhw_climate_id: heatpump_climate_dhw
 
-  # Heating and cooling performance
+  # Heating performance
   heating_consumed_id: heating_consumed
   heating_produced_id: heating_delivered
   heating_cop_id: heating_cop
-  cooling_consumed_id: cool_consumed
-  cooling_produced_id: cool_delivered
-  cooling_cop_id: cool_cop
 
   # Status sensors
   status_compressor_id: status_compressor
@@ -196,7 +187,6 @@ asgard_dashboard:
   status_water_pump_id: status_water_pump
   status_in1_request_id: status_in1_request
   status_in6_request_id: status_in6_request
-  zone2_enabled_id: status_zone2_enabled
   status_short_cycle_lockout_id: status_short_cycle_lockout
 
   # Adaptive controls
@@ -220,13 +210,10 @@ asgard_dashboard:
   sw_server_control_id: heatpump_switch_server_control_mode
   sw_sc_prohibit_dhw_id: heatpump_switch_server_control_prohibit_dhw
   sw_sc_prohibit_z1_heating_id: heatpump_switch_server_control_prohibit_z1_heating
-  sw_sc_prohibit_z1_cooling_id: heatpump_switch_server_control_prohibit_z1_cooling
 
   # Additional settings
   solver_kwh_meter_feedback_source_id: solver_kwh_meter_feedback_source
   solver_kwh_meter_feedback_id: solver_kwh_meter_feedback
-  num_cooling_smart_start_z1_id: cooling_smart_start_temp
-  num_min_cooling_flow_z1_id: minimum_cooling_flow_temp_z1
   num_temperature_feedback_z1_id: temperature_feedback_z1
   sw_power_mode_id: heatpump_switch_power_mode
   sw_service_codes_enabled_id: heatpump_switch_service_codes_enabled
