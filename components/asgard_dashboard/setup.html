@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asgard Setup</title>
+    <title>Ecodan Setup</title>
     <style>
-        /* Import official Asgard fonts */
+        /* Import dashboard fonts */
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-        /* Asgard Dashboard color palette and variables */
+        /* Dashboard color palette and variables */
         :root {
             --bg:     #0a0e1a;
             --bg2:    #0f1525;
@@ -164,7 +164,7 @@
 
 <div class="wizard-wrap">
     <div class="brand-container">
-        <div class="brand-wordmark">ASGARD</div>
+        <div class="brand-wordmark">ECODAN</div>
         <div class="brand-sub">Setup Wizard</div>
     </div>
 
@@ -191,8 +191,8 @@
             <div class="step-desc">Which thermostat do you want to use to control your room temperature?</div>
             
             <div class="option-card" id="opt-virtual" onclick="selectThermostat('virtual')">
-                <div class="opt-title">Asgard Virtual Thermostat</div>
-                <div class="opt-desc">Asgard drives the heat pump directly through the R1/R2 relays (IN1/IN6), giving Auto Adaptive full control of the system.</div>
+                <div class="opt-title">Virtual Thermostat</div>
+                <div class="opt-desc">When supported by your controller, relay outputs R1/R2 can signal heat demand through FTC inputs IN1/IN6, giving Auto Adaptive direct control of the system.</div>
             </div>
             <div style="height: 12px;"></div>
             <div class="option-card" id="opt-mrc" onclick="selectThermostat('mrc')">
@@ -203,14 +203,14 @@
             <div class="info-box" id="info-virtual" style="display: none;">
                 <b>Using the virtual thermostat requires some wiring:</b>
                 <ul class="option-list">
-                    <li><b>Zone 1:</b> connect 2 spare wires from Asgard <code>R1</code> to <code>IN1</code> on the FTC board. Set dip-switch <b>SW2-1</b> to <b>ON</b>.</li>
-                    <li><b>Zone 2:</b> connect 2 spare wires from Asgard <code>R2</code> to <code>IN6</code> on the FTC board. Set dip-switch <b>SW3-1</b> to <b>ON</b>.</li>
+                    <li><b>Zone 1:</b> where your controller provides a relay output, connect it to <code>IN1</code> on the FTC board. Set dip-switch <b>SW2-1</b> to <b>ON</b>.</li>
+                    <li><b>Zone 2:</b> where your controller provides a second relay output, connect it to <code>IN6</code> on the FTC board. Set dip-switch <b>SW3-1</b> to <b>ON</b>.</li>
                     <li><b>Migrating from a wireless (CNRF) thermostat?</b> Set dip-switch <b>SW1-8</b> to <b>OFF</b>.</li>
                     <li><b>Using the wireless thermostat as temperature source?</b> Keep <b>SW1-8</b> in the <b>ON</b> position and set on the MRC: <i>Initial settings → Room sensor settings → Room RC zone select</i> to <b>MRC</b>.</li>
                     <li><b>⚠ Switch the heat pump power off</b> at the breaker before touching any internal wiring.</li>
                 </ul>
                 The virtual thermostat also needs a room temperature source (REST API / Home Assistant, a DS18B20 or the MRC sensor) — that is configured in the steps that follow.<br><br>
-                Full installation and dip-switch details: <a href="https://github.com/gekkekoe/esphome-ecodan-hp/blob/main/asgard/manual.md" target="_blank" style="color: var(--accent);">Asgard manual</a>
+                Full installation and dip-switch details: <a href="https://github.com/gekkekoe/esphome-ecodan-hp/blob/main/asgard/manual.md" target="_blank" style="color: var(--accent);">installation manual</a>
             </div>
             <div class="info-box" id="info-mrc" style="display: none; border-color: var(--warn); color: var(--warn);">
                 <b>Use Room Thermostat</b> will be enabled on the dashboard, activating the MRC / wireless thermostat panel. Set your room setpoints on the MRC or wireless thermostat.
@@ -240,7 +240,7 @@
             <div class="ctrl-row">
                 <span class="ctrl-label">Operating Mode</span>
                 <select id="w-op-mode-z1" class="ctrl-select" onchange="toggleModeSettings()">
-                    <!-- Index 1 corresponds to Heat Flow, Index 4 to Cool Flow in Asgard options -->
+                    <!-- Index 1 corresponds to Heat Flow, Index 4 to Cool Flow in the operating mode options -->
                     <option value="1">Heat Flow Temperature</option>
                     <option value="4">Cool Flow Temperature</option>
                 </select>
@@ -309,12 +309,12 @@
                 <select id="w-room-src-z1" class="ctrl-select">
                     <option value="0">Room Thermostat</option>
                     <option value="1">Home Assistant / REST API</option>
-                    <option value="2">Asgard Virtual Thermostat</option>
+                    <option value="2">Virtual Thermostat</option>
                 </select>
             </div>
             
             <div class="ctrl-row">
-                <span class="ctrl-label param-label">Temp Sensor Source Z1<span class="tip-icon">?</span><span class="tip-box">The temperature sensor source for the Asgard Virtual Thermostat.</span></span>
+                <span class="ctrl-label param-label">Temp Sensor Source Z1<span class="tip-icon">?</span><span class="tip-box">The temperature sensor source for the Virtual Thermostat.</span></span>
                 <select id="w-temp-src-z1" class="ctrl-select" onchange="toggleApiInfo('z1')">
                     <option value="0">Virtual Thermostat Input</option>
                     <option value="1">DS18x20 (Dallas)</option>
@@ -341,12 +341,12 @@
                     <select id="w-room-src-z2" class="ctrl-select">
                         <option value="0">Room Thermostat</option>
                         <option value="1">Home Assistant / REST API</option>
-                        <option value="2">Asgard Virtual Thermostat</option>
+                        <option value="2">Virtual Thermostat</option>
                     </select>
                 </div>
                 
                 <div class="ctrl-row">
-                    <span class="ctrl-label param-label">Temp Sensor Source Z2<span class="tip-icon">?</span><span class="tip-box">The temperature sensor source for the Asgard Virtual Thermostat.</span></span>
+                    <span class="ctrl-label param-label">Temp Sensor Source Z2<span class="tip-icon">?</span><span class="tip-box">The temperature sensor source for the Virtual Thermostat.</span></span>
                     <select id="w-temp-src-z2" class="ctrl-select" onchange="toggleApiInfo('z2')">
                         <option value="0">Virtual Thermostat Input</option>
                         <option value="1">DS18x20 (Dallas)</option>
@@ -377,7 +377,7 @@
             </div>
 
             <div class="info-box">
-                When enabled, Asgard will continuously monitor the delta between the room temperature and the setpoint to automatically adjust the flow temperature of the heat pump.
+                When enabled, Auto Adaptive continuously monitors the difference between room temperature and the setpoint to adjust the heat pump's flow temperature.
             </div>
         </div>
 
@@ -470,7 +470,7 @@
     // - MRC / wireless: Room Temp Source = Room Thermostat (0), Temp Sensor
     //   Source = MRC / Wireless (2), and the virtual-thermostat options are
     //   disabled — they cannot work without the R1/R2 relay wiring.
-    // - Virtual: Room Temp Source = Asgard Virtual Thermostat (2), Temp Sensor
+    // - Virtual: Room Temp Source = Virtual Thermostat (2), Temp Sensor
     //   Source = Virtual Thermostat Input (0); every option stays selectable.
     function selectThermostat(choice) {
         thermostatChoice = choice;
@@ -499,7 +499,7 @@
             const tempSrc = document.getElementById(`w-temp-src-${zone}`);
             if (!roomSrc || !tempSrc) continue;
 
-            // "Asgard Virtual Thermostat" (2) and "Virtual Thermostat Input" (0)
+            // "Virtual Thermostat" (2) and "Virtual Thermostat Input" (0)
             // require the R1/R2 relays — unusable with the MRC / wireless.
             setOptionDisabled(roomSrc, "2", isMrc);
             setOptionDisabled(tempSrc, "0", isMrc);
@@ -508,7 +508,7 @@
                 roomSrc.value = "0";   // Room Thermostat
                 tempSrc.value = "2";   // MRC / Wireless
             } else {
-                roomSrc.value = "2";   // Asgard Virtual Thermostat
+                roomSrc.value = "2";   // Virtual Thermostat
                 tempSrc.value = "0";   // Virtual Thermostat Input
             }
             toggleApiInfo(zone);
@@ -568,7 +568,7 @@
     // Toggle parameters based on Heat or Cool selection in Step 2
     function toggleModeSettings() {
         const mode = document.getElementById('w-op-mode-z1').value;
-        const isCooling = (mode === "4"); // 4 corresponds to Cool Flow Temperature in Asgard
+        const isCooling = (mode === "4"); // 4 corresponds to Cool Flow Temperature
 
         // Zone 1
         document.getElementById('z1-heat-settings').style.display = isCooling ? 'none' : 'block';

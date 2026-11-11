@@ -1442,7 +1442,7 @@ void EcodanDashboard::handle_export_hourly_(AsyncWebServerRequest *request) {
   httpd_resp_set_status(req, "200 OK");
   httpd_resp_set_type(req, "application/octet-stream");
   httpd_resp_set_hdr(req, "Cache-Control", "no-cache");
-  httpd_resp_set_hdr(req, "Content-Disposition", "attachment; filename=asgard_history_backup.bin");
+  httpd_resp_set_hdr(req, "Content-Disposition", "attachment; filename=ecodan_history_backup.bin");
   httpd_resp_set_hdr(req, "Connection", "close");
 
   // The export header describes the chronological layout: head == count, so
@@ -1505,7 +1505,7 @@ void EcodanDashboard::handle_export_physics_(AsyncWebServerRequest *request) {
   httpd_resp_set_status(req, "200 OK");
   httpd_resp_set_type(req, "application/json");
   httpd_resp_set_hdr(req, "Cache-Control", "no-cache");
-  httpd_resp_set_hdr(req, "Content-Disposition", "attachment; filename=asgard_physics_backup.json");
+  httpd_resp_set_hdr(req, "Content-Disposition", "attachment; filename=ecodan_physics_backup.json");
   httpd_resp_set_hdr(req, "Connection", "close");
 
   // The raw_* entities are the pump's EMA'd "typical day" values - the same

@@ -3272,7 +3272,7 @@ function downloadSettingsBackup() {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `asgard_settings_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.json`;
+  a.download = `ecodan_settings_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.json`;
   a.click();
   window.URL.revokeObjectURL(url);
 
