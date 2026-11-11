@@ -5,7 +5,7 @@ from esphome.const import CONF_ID
 from esphome.components import esp32
 
 DEPENDENCIES = ["web_server_base", "network"]
-AUTO_LOAD = ["web_server_base"]
+AUTO_LOAD = ["web_server_base", "text"]
 
 CONF_WEB_SERVER_BASE_ID = "web_server_base_id"
 CONF_ECODAN_ID = "ecodan_id"
