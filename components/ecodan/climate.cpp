@@ -83,6 +83,7 @@ namespace ecodan
                     break;
                 case ecodan::Status::OperationMode::UNAVAILABLE:
                 case ecodan::Status::OperationMode::OFF:
+                case ecodan::Status::OperationMode::COOL_ON:
                 case ecodan::Status::OperationMode::DHW_ON:
                 case ecodan::Status::OperationMode::LEGIONELLA_PREVENTION:
                     break;
