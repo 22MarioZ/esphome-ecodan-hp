@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asgard Dashboard</title>
+<title>Ecodan Dashboard</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Space+Grotesk:wght@300;400;500;600&display=swap');
 
@@ -323,7 +323,7 @@ header {
 <body>
 
 <header>
-  <span class="brand-logo">ASGARD</span>
+  <span class="brand-logo">ECODAN</span>
   <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
     <!-- Update indicator (hidden by default) -->
     <span id="update-indicator" style="display: none; cursor: pointer; align-items: center; gap: 5px; color: var(--warn);" onclick="goToUpdateTab()" title="Update Available! Click to view.">
@@ -722,7 +722,7 @@ header {
       
       <div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 10px; background: var(--bg2);">
         <div class="sub-label" style="margin-top: 0; border: none; padding-bottom: 5px;">General Settings</div>
-        <div class="ctrl-row"><span class="ctrl-label param-label">Enable AA Control<span class="tip-icon">?</span><span class="tip-box">Master switch for Asgard's Auto-Adaptive flow-temperature algorithm.</span></span><label class="toggle-wrap"><input type="checkbox" id="sw-aa" onchange="sendSwitch('auto_adaptive_control_enabled', this.checked)"><span class="toggle-slider"></span></label></div>
+        <div class="ctrl-row"><span class="ctrl-label param-label">Enable AA Control<span class="tip-icon">?</span><span class="tip-box">Master switch for Auto-Adaptive flow-temperature algorithm.</span></span><label class="toggle-wrap"><input type="checkbox" id="sw-aa" onchange="sendSwitch('auto_adaptive_control_enabled', this.checked)"><span class="toggle-slider"></span></label></div>
         <div class="ctrl-row"><span class="ctrl-label param-label">Defrost Mitigation<span class="tip-icon">?</span><span class="tip-box">Adjusts Auto-Adaptive behaviour in conditions where ice formation on the outdoor unit is likely, to reduce defrost frequency and its associated temperature dips.</span></span><label class="toggle-wrap"><input type="checkbox" id="sw-dm" onchange="sendSwitch('defrost_risk_handling_enabled', this.checked)"><span class="toggle-slider"></span></label></div>
         <div class="ctrl-row" style="border-bottom: none; padding-bottom: 0;"><span class="ctrl-label param-label">Smart Boost<span class="tip-icon">?</span><span class="tip-box">Temporarily raises the flow-temperature target when the room is stagnating below setpoint, to recover faster than gradual adaptive control alone would.</span></span><label class="toggle-wrap"><input type="checkbox" id="sw-sb" onchange="sendSwitch('smart_boost_enabled', this.checked)"><span class="toggle-slider"></span></label></div>
       </div>
@@ -753,11 +753,11 @@ header {
             <span class="tip-box">
               <span class="tip-unit">Room Thermostat</span>MRC or Wireless thermostat.<br><br>
               <span class="tip-unit">HA / REST API</span>Reads temp pushed via REST API or HA. ('number.temperature_feedback_z1')<br><br>
-              <span class="tip-unit">Asgard Virtual Thermostat</span>Uses the Virtual Thermostat — including when the Virtual Thermostat itself reads ODIN's room temperature.
+              <span class="tip-unit">Virtual Thermostat</span>Uses the Virtual Thermostat — including when the Virtual Thermostat itself reads ODIN's room temperature.
             </span>
           </span>
           <select class="ctrl-select" id="sel-z1src" onchange="sendSelect('room_temp_source_z1', this)">
-            <option>Room Thermostat</option><option>Home Assistant / REST API</option><option>Asgard Virtual Thermostat</option>
+            <option>Room Thermostat</option><option>Home Assistant / REST API</option><option>Virtual Thermostat</option>
           </select>
         </div>
 
@@ -798,11 +798,11 @@ header {
               <span class="tip-box">
                 <span class="tip-unit">Room Thermostat</span>MRC or Wireless thermostat.<br><br>
                 <span class="tip-unit">HA / REST API</span>Reads temp pushed via REST API or HA. ('number.temperature_feedback_z2')<br><br>
-                <span class="tip-unit">Asgard Virtual Thermostat</span>Uses the Virtual Thermostat — including when the Virtual Thermostat itself reads ODIN's room temperature.
+                <span class="tip-unit">Virtual Thermostat</span>Uses the Virtual Thermostat — including when the Virtual Thermostat itself reads ODIN's room temperature.
               </span>
             </span>
             <select class="ctrl-select" id="sel-z2src" onchange="sendSelect('room_temp_source_z2', this)">
-              <option>Room Thermostat</option><option>Home Assistant / REST API</option><option>Asgard Virtual Thermostat</option>
+              <option>Room Thermostat</option><option>Home Assistant / REST API</option><option>Virtual Thermostat</option>
             </select>
           </div>
 
@@ -2984,14 +2984,14 @@ function toggleThermostatUI(zone, useRoom) {
   if (vZ) vZ.style.display = useRoom ? 'none' : 'block';
 }
 
-// Room Temp Source options: 0 = Room Thermostat, 1 = HA/REST API, 2 = Asgard Virtual Thermostat.
+// Room Temp Source options: 0 = Room Thermostat, 1 = HA/REST API, 2 = Virtual Thermostat.
 // When "Use Room Thermostat" is on, the virtual thermostat can't be the source (and vice versa),
 // so we disable the invalid option. Passive call only toggles availability, no auto-send.
 function applyRoomSourceConstraints(zone, useRoom) {
   const sel = document.getElementById('sel-' + zone + 'src');
   if (!sel || sel.options.length < 3) return;
   const roomOpt = sel.options[0]; // Room Thermostat
-  const vtOpt   = sel.options[2]; // Asgard Virtual Thermostat
+  const vtOpt   = sel.options[2]; // Virtual Thermostat
   if (useRoom) { vtOpt.disabled = true;  roomOpt.disabled = false; }
   else         { roomOpt.disabled = true; vtOpt.disabled = false; }
 }
@@ -3005,7 +3005,7 @@ function updateRoomSourceTemp(zone, d) {
   let val = null;
   if (srcIdx === 0)      val = (zone === 'z1') ? d.room_z1_current : d.room_z2_current;             // Room Thermostat
   else if (srcIdx === 1) val = (zone === 'z1') ? d.temperature_feedback_z1 : d.temperature_feedback_z2; // HA / REST API
-  else if (srcIdx === 2) val = (zone === 'z1') ? d.z1_current_temp : d.z2_current_temp;             // Asgard Virtual Thermostat
+  else if (srcIdx === 2) val = (zone === 'z1') ? d.z1_current_temp : d.z2_current_temp;             // Virtual Thermostat
   setText(zone + 'src-temp', fmt1(val));
 
   const fbRow = document.getElementById('row-' + zone + '-fb');
@@ -3017,7 +3017,7 @@ async function sendUI(zone, val) {
   applyRoomSourceConstraints(zone, val);
 
   // Auto-pick a valid Room Temp Source: Room Thermostat when using it,
-  // otherwise fall back to the Asgard Virtual Thermostat (only when the current
+  // otherwise fall back to the Virtual Thermostat (only when the current
   // pick just became invalid), and persist the change.
   const sel = document.getElementById('sel-' + zone + 'src');
   if (sel) {

@@ -1,4 +1,8 @@
 # ESPHome Ecodan heatpump
+
+> [!NOTE]
+> This fork contains modifications made for personal use and is maintained on a limited basis. For the latest updates and ongoing support, please use the [original repository](https://github.com/gekkekoe/esphome-ecodan-hp).
+
 ESPHome implementation of the CN105 protocol. It can operate as standalone or with slave (Melcloud/Procon) attached. It includes server control mode, realtime power output estimation, and realtime daily energy counters.
 
 The remote thermostat protocol CNRF is supported by [esphome-ecodan-remote-thermostat](https://github.com/gekkekoe/esphome-ecodan-remote-thermostat). It implements a virtual thermostat that can be linked with any temperature sensor. Alternatively the [Asgard PCB](https://github.com/gekkekoe/esphome-ecodan-hp/blob/main/asgard/README.md) supports a higher resolution virtual thermostat.

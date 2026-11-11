@@ -1,19 +1,28 @@
 substitutions:
   name: ecodan-heatpump
+  devicename: ecodan-heatpump
   friendlyName: Ecodan heatpump
 
 # enable ota update via http request
 http_request:
   buffer_size_tx: 20248
 
-ota:
-  - platform: esphome
-  - platform: http_request
-  - platform: web_server
+#captive_portal:
+#  id: id_captive_portal
+
+#ota:
+#  - platform: esphome
+#  - platform: http_request
+#  - platform: web_server
 #  password: !secret heatpump_ota_password
 
-api:
-  reboot_timeout: 0s
+#wifi: !include common/wifi.yaml
+#api: !include common/apie.yaml 
+#web_server: !include common/web_server.yaml
+#ota: !include common/ota.yaml
+
+#api:
+#  reboot_timeout: 0s
 #  encryption:
 #    key: !secret heatpump_encryption_key
 
@@ -48,13 +57,29 @@ api:
 #  adaptive: !include confs/auto-adaptive.yaml
 
 external_components:
-  - source: github://gekkekoe/esphome-ecodan-hp@main
-    components: [ ecodan, optimizer ]
+  - source: github://22MarioZ/esphome-ecodan-hp@main
+    components:
+      - ecodan
+      - optimizer
+      - asgard_dashboard
     refresh: always
+    
+  # Locally patched Asgard dashboard
+#  - source:
+#      type: local
+#      path: components
+#    components:
+#      - asgard_dashboard
 
 packages:
+  # Local common ESPHome configuration packages
+  common_wifi: !include common/wifi.yaml
+  common_ota: !include common/ota.yaml
+  common_api: !include common/apie.yaml
+  common_web_server: !include common/web_server.yaml
+
   remote_package:
-    url: https://github.com/gekkekoe/esphome-ecodan-hp/
+    url: https://github.com/22MarioZ/esphome-ecodan-hp
     ref: main
     refresh: always
     files: [ 
@@ -82,7 +107,7 @@ packages:
             # confs/ecodan-labels-pl.yaml,  # Polish
             # confs/ecodan-labels-sl.yaml,  # Slovenian
             confs/debug.yaml,
-            confs/wifi.yaml,
+            #confs/wifi.yaml,
             confs/led.yaml,
            ]
 
@@ -111,9 +136,9 @@ logger:
   #   ecodan.component: ERROR
 
 # Enable Web server.
-web_server:
-  port: 80
-  local: true
+#web_server:
+#  port: 80
+#  local: true
   #ota: true
 
 ecodan:
@@ -124,3 +149,92 @@ ecodan:
 # uncomment line below and adjust the heat constant if your system uses a water + glycol mixture
 #  specific_heat_constant_override: 3.9
 
+asgard_dashboard:
+  id: ecodan_dashboard
+  ecodan_id: ecodan_instance
+
+  # Required Zone 1 flow-temperature climate
+  flow_climate_z1_id: heatpump_climate_z1
+
+  # Main monitoring sensors
+  hp_feed_temp_id: hp_feed_temp
+  hp_return_temp_id: hp_return_temp
+  outside_temp_id: outside_temp
+  compressor_frequency_id: compressor_frequency
+  flow_rate_id: flow_rate
+  computed_output_power_id: computed_output_power
+  daily_computed_output_power_id: daily_computed_output_power
+  daily_total_energy_consumption_id: delta_energy_consumed_increasing
+  compressor_starts_id: compressor_starts
+  runtime_id: runtime
+  z1_flow_temp_target_id: z1_flow_temp_target
+  operation_mode_id: operation_mode
+  liquid_pipe_temp_id: ou_liquid_pipe_temp
+  condensing_temp_id: hp_refrigerant_condensing_temp
+
+  # Domestic hot water
+  dhw_temp_id: dhw_temp
+  dhw_flow_temp_target_id: dhw_flow_temp_target
+  dhw_flow_temp_drop_id: dhw_flow_temp_drop
+  dhw_consumed_id: dhw_consumed
+  dhw_delivered_id: dhw_delivered
+  dhw_cop_id: ddhw_cop
+  dhw_climate_id: heatpump_climate_dhw
+
+  # Heating and cooling performance
+  heating_consumed_id: heating_consumed
+  heating_produced_id: heating_delivered
+  heating_cop_id: heating_cop
+  cooling_consumed_id: cool_consumed
+  cooling_produced_id: cool_delivered
+  cooling_cop_id: cool_cop
+
+  # Status sensors
+  status_compressor_id: status_compressor
+  status_booster_id: status_booster
+  status_defrost_id: status_defrost
+  status_water_pump_id: status_water_pump
+  status_in1_request_id: status_in1_request
+  status_in6_request_id: status_in6_request
+  zone2_enabled_id: status_zone2_enabled
+  status_short_cycle_lockout_id: status_short_cycle_lockout
+
+  # Adaptive controls
+  sw_auto_adaptive_id: auto_adaptive_control_enabled
+  sw_defrost_mit_id: defrost_risk_handling_enabled
+  sw_smart_boost_id: smart_boost_enabled
+  sw_legionella_dhw_automation_id: legionella_dhw_automation_enabled
+  num_legionella_dhw_setpoint_id: legionella_dhw_setpoint
+  num_aa_setpoint_bias_id: auto_adaptive_setpoint_bias
+  num_max_flow_temp_id: maximum_heating_flow_temp
+  num_min_flow_temp_id: minimum_heating_flow_temp
+  sel_heating_system_type_id: heating_system_type
+  sel_room_temp_source_z1_id: temperature_feedback_source_z1
+  operating_mode_z1_id: heatpump_select_operating_mode
+  predictive_short_cycle_control_enabled_id: predictive_short_cycle_control_enabled
+
+  # Zone 1 room climate
+  heatpump_climate_z1_id: heatpump_climate_room_z1
+
+  # Server control
+  sw_server_control_id: heatpump_switch_server_control_mode
+  sw_sc_prohibit_dhw_id: heatpump_switch_server_control_prohibit_dhw
+  sw_sc_prohibit_z1_heating_id: heatpump_switch_server_control_prohibit_z1_heating
+  sw_sc_prohibit_z1_cooling_id: heatpump_switch_server_control_prohibit_z1_cooling
+
+  # Additional settings
+  solver_kwh_meter_feedback_source_id: solver_kwh_meter_feedback_source
+  solver_kwh_meter_feedback_id: solver_kwh_meter_feedback
+  num_cooling_smart_start_z1_id: cooling_smart_start_temp
+  num_min_cooling_flow_z1_id: minimum_cooling_flow_temp_z1
+  num_temperature_feedback_z1_id: temperature_feedback_z1
+  sw_power_mode_id: heatpump_switch_power_mode
+  sw_service_codes_enabled_id: heatpump_switch_service_codes_enabled
+  sw_holiday_mode_id: heatpump_switch_holiday
+  minimum_compressor_on_time_id: minimum_compressor_on_time
+  lockout_duration_id: lockout_duration
+  lockout_strategy_id: lockout_strategy
+  short_cycle_mitigation_button_id: short_cycle_mitigation_button
+  sw_force_dhw_id: heatpump_switch_force_dhw
+  regular_dhw_button_id: heatpump_button_regular_dhw
+  reboot_button_id: restart_button
